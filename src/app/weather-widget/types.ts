@@ -1,6 +1,8 @@
+
 export interface WeatherData {
-  temperature?: number;
-  sky?: string;
   location?: string;
+  sky?: string;
+  temperature?: number;
 }
+
 export type TimeSpan = 'today' | 'tomorrow';

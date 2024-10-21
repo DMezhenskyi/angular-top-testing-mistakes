@@ -7,19 +7,21 @@ describe(`WeatherWidgetComponent`, () => {
   let component: WeatherWidgetComponent;
   let fixture: ComponentFixture<WeatherWidgetComponent>;
 
-  let widgetTestingData: WeatherData = {
-    location: `Test Country`,
-    sky: `🌧️`,
-    temperature: 20
-  };
+  let widgetTestingData: WeatherData;
 
   beforeEach(() => {
     fixture = TestBed.createComponent(WeatherWidgetComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
+    widgetTestingData  = {
+      location: `Test Country`,
+      sky: `🌧️`,
+      temperature: 20
+    };
   });
 
   it(`should render weather data if provided`, () => {
-    component.data = widgetTestingData;
+    fixture.componentRef.setInput('data', widgetTestingData);
     fixture.detectChanges();
     const locationEl = fixture.debugElement.query(By.css('.location'));
     const skyEl = fixture.debugElement.query(By.css('.sky-condition'));
@@ -31,23 +33,25 @@ describe(`WeatherWidgetComponent`, () => {
   })
   it(`should show "no-location" placeholder if no location provided`, () => {
     widgetTestingData.location = undefined;
-    component.data = widgetTestingData;
+    fixture.componentRef.setInput('data', widgetTestingData);
 
     fixture.detectChanges();
 
-    const noLocationEl = fixture.debugElement.query(By.css('.no-location'));
+    const noLocationEl = fixture.debugElement.query(
+      By.css('[data-testId="no-location"]')
+    );
     expect(noLocationEl).toBeTruthy();
   })
   it(`should emit (timeSpanChange) when time span changes`, () => {
+    let expectedOutput: string | undefined;
     component.timeSpanChange.subscribe((period) => {
-      expect(period).toBe('tomorrow');
+      expectedOutput = period;
     })
-
-    component.onTimeSpanChanges({
-      target: {
-        value: 'tomorrow'
-      }
-    } as any)
-
+    
+    const selectEl = fixture.debugElement.query(By.css('[data-testId="time-span"]'))
+    selectEl.nativeElement.value = 'tomorrow';
+    selectEl.nativeElement.dispatchEvent(new Event('change'))
+    
+    expect(expectedOutput).toBe('tomorrow');
   });
 });
